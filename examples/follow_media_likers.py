@@ -18,15 +18,13 @@ from instabot import Bot  # noqa: E402
 
 
 def follow(bot, user_id):
-    bot.follow(user_id)
-    return True
+    return bot.follow(user_id)
 
 
 def follow_media_likers(bot, media):
     for user in tqdm(bot.get_media_likers(media), desc="Media likers"):
-        follow(bot, user)
-        #time.sleep(10 + 20 * random.random())
-        time.sleep(1)
+        if follow(bot, user):
+            time.sleep(30 + 20 * random.random())
     return True
 
 
@@ -36,9 +34,14 @@ parser.add_argument("-p", type=str, help="password")
 parser.add_argument("-proxy", type=str, help="proxy")
 parser.add_argument("-media_id", type=str, help="media_id")
 parser.add_argument("-follow_delay", type=float, help="follow_delay")
+parser.add_argument("-max_follows_per_day", type=int, help="max_follows_per_day")
 args = parser.parse_args()
 
-bot = Bot(max_follows_per_day=500, follow_delay=args.follow_delay, filter_private_users=False)
+bot = Bot(max_following_to_follow=7000, 
+          max_follows_per_day=args.max_follows_per_day, 
+          follow_delay=args.follow_delay, 
+          filter_private_users=False)
+
 bot.login(username=args.u, password=args.p)
 
 follow_media_likers(bot, args.media_id)
